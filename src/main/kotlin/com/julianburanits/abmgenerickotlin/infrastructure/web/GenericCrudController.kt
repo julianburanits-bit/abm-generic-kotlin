@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*
  */
 @RestController
 class GenericCrudController<T : Entity<ID>, ID>(
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private val service: GenericCrudService<T, ID>
 ) {
 
