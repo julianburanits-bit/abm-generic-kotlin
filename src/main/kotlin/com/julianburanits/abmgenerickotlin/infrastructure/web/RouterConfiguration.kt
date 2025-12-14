@@ -1,34 +1,65 @@
 package com.julianburanits.abmgenerickotlin.infrastructure.web
 
+import com.julianburanits.abmgenerickotlin.domain.example.Product
+import com.julianburanits.abmgenerickotlin.domain.service.GenericCrudService
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.MediaType
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.router
 
 /**
- * Configuration that dynamically registers GenericCrudController instances
- * with specific base paths.
- *
- * To add a new entity, simply create a bean of type GenericCrudService<T, ID>
- * annotated with @Service and a custom name, then add it here with the desired path.
- *
- * Example: for users → path "/api/users"
+ * Functional-style router configuration.
+ * Registers CRUD endpoints for specific entities.
  */
 @Configuration
 class RouterConfiguration(private val context: ApplicationContext) {
 
-    // Uncomment and customize when a concrete service is added
-    // @Bean
-    // fun userRouter() = router {
-    //     val userService = context.getBean("userCrudService", GenericCrudService::class.java)
-    //     val controller = GenericCrudController(userService as GenericCrudService<User, Long>)
-    //     "/api/users".nest {
-    //         GET { controller.findAll() }
-    //         GET("/{id}") { controller.findById(it.pathVariable("id").toLong()) }
-    //         POST { controller.create(it.body(User::class.java)) }
-    //         PUT("/{id}") { controller.update(it.pathVariable("id").toLong(), it.body(User::class.java)) }
-    //         DELETE("/{id}") { controller.deleteById(it.pathVariable("id").toLong()); ServerResponse.noContent().build() }
-    //     }
-    // }
+    @Configuration
+    class RouterConfiguration(private val context: ApplicationContext) {
 
-    // Placeholder: no routes registered yet
-    // fun routes() = router { }
+        @Bean
+        fun productRouter() = router {
+            val service = context.getBean("productCrudService", GenericCrudService::class.java)
+                    as GenericCrudService<Product, Long>
+
+            "/api/products".nest {
+                accept(MediaType.APPLICATION_JSON).nest {
+                    GET {
+                        ServerResponse.ok().body(service.findAll())
+                    }
+
+                    GET("/{id}") { req ->
+                        val id = req.pathVariable("id").toLong()
+                        val product = service.findById(id)
+                        if (product != null) {
+                            ServerResponse.ok().body(product)
+                        } else {
+                            ServerResponse.notFound().build()
+                        }
+                    }
+
+                    POST { req ->
+                        val product = req.body(Product::class.java)
+                        val saved = service.save(product)
+                        ServerResponse.status(201).body(saved)
+                    }
+
+                    PUT("/{id}") { req ->
+                        val id = req.pathVariable("id").toLong()
+                        val product = req.body(Product::class.java)
+                        val updated = service.save(product.copy(id = id))
+                        ServerResponse.ok().body(updated)
+                    }
+
+                    DELETE("/{id}") { req ->
+                        val id = req.pathVariable("id").toLong()
+                        service.deleteById(id)
+                        ServerResponse.noContent().build()
+                    }
+                }
+            }
+        }
+    }
 }
