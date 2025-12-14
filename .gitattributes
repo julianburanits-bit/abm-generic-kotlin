@@ -1,0 +1,10 @@
+# Normalizar la mayoría de archivos a LF en el repositorio
+* text=auto eol=lf
+
+# Scripts Unix (mvnw, gradlew, *.sh) siempre LF
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Scripts Windows (*.cmd, *.bat) siempre CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
