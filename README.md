@@ -38,7 +38,7 @@ src/main/kotlin/com/tuportfolio/abmgeneric/
 
 ## Quick Start
 # Clone and run
-git clone https://github.com/your-username/abm-generic-kotlin.git
+git clone https://github.com/julianburanits-bit/abm-generic-kotlin.git
 cd abm-generic-kotlin
 ./mvnw spring-boot:run
 
@@ -68,6 +68,7 @@ curl -X DELETE http://localhost:8080/api/products/1     # DELETE
 - Pagination and filtering
 - OpenAPI/Swagger documentation
 - Turn into a reusable Spring Boot starter
+- Add changelog
 
 ***
 
